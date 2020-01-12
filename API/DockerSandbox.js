@@ -125,19 +125,28 @@ DockerSandbox.prototype.prepare = function(success)
 
 DockerSandbox.prototype.execute = function(success)
 {
-    var exec = require('child_process').exec;
+    var {exec} = require('child_process');
     var fs = require('fs');
     var myC = 0; //variable to enforce the timeout_value
     var sandbox = this;
 
     //this statement is what is executed
-    var st = this.path+'DockerTimeout.sh ' + this.timeout_value + 's -u mysql -e \'NODE_PATH=/usr/local/lib/node_modules\' -i -t -v  "' + this.path + this.folder + '":/usercode ' + this.vm_name + ' /usercode/script.sh ' + this.compiler_name + ' ' + this.file_name + ' ' + this.output_command+ ' ' + this.extra_arguments;
+    var st = this.path+'DockerTimeout.sh ' + this.timeout_value + 's -e \'NODE_PATH=/usr/local/lib/node_modules\' -i -t -v  "' + this.path + this.folder + '":/usercode ' + this.vm_name + ' /usercode/script.sh ' + this.compiler_name + ' ' + this.file_name + ' ' + this.output_command+ ' ' + this.extra_arguments;
     
     //log the statement in console
     console.log(st);
 
     //execute the Docker, This is done ASYNCHRONOUSLY
-    exec(st);
+    exec(st , (error , stdout , stderr)=>{
+        if(error){
+            console.log(error);
+        }
+        if(stderr){
+            console.log(stderr);
+        }
+        //Sucess 
+        console.log(stdout);
+    });
     console.log("------------------------------")
     //Check For File named "completed" after every 1 second
     var intid = setInterval(function() 
